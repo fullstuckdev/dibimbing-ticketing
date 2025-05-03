@@ -30,6 +30,8 @@ A RESTful API for a ticketing system built with Go, Gin framework, GORM ORM, and
   /config           - Configuration
   /middleware       - HTTP middleware
   /reports          - Reporting functionality
+  /docs             - Swagger documentation
+  /postman          - Postman collection
   main.go           - Application entry point
 ```
 
@@ -105,4 +107,24 @@ The server will start at http://localhost:8080 (or the port specified in your .e
 
 ## API Documentation
 
-API documentation is available using Swagger annotations and can be accessed at `/swagger/index.html` when running in development mode.
+### Swagger UI
+
+The API is documented using Swagger. After starting the application, you can access the Swagger UI at:
+
+```
+http://localhost:8080/swagger/index.html
+```
+
+This provides an interactive documentation where you can view all endpoints and even test them.
+
+### Postman Collection
+
+A Postman collection is included in the `postman` directory. To use it:
+
+1. Open Postman
+2. Click on "Import" button
+3. Select the file `postman/ticketing_system_api.json`
+4. After importing, set the necessary environment variables:
+   - `base_url`: Your API base URL (default: http://localhost:8080)
+   - `token`: JWT token obtained after login as a regular user
+   - `admin_token`: JWT token obtained after login as an admin user

@@ -5,8 +5,11 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/taufikmulyawan/ticketing-system/config"
 	"github.com/taufikmulyawan/ticketing-system/controller"
+	_ "github.com/taufikmulyawan/ticketing-system/docs"
 	"github.com/taufikmulyawan/ticketing-system/middleware"
 	"github.com/taufikmulyawan/ticketing-system/repository"
 	"github.com/taufikmulyawan/ticketing-system/service"
@@ -55,6 +58,9 @@ func main() {
 
 		c.Next()
 	})
+
+	// Swagger documentation
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Public routes
 	router.POST("/register", userController.Register)
