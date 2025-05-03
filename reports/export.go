@@ -31,7 +31,7 @@ func GenerateSalesSummaryPDF(summary *types.SalesSummary) ([]byte, error) {
 	pdf.Ln(8)
 	pdf.Cell(40, 10, fmt.Sprintf("Total Tickets Sold: %d", summary.TotalTickets))
 	pdf.Ln(8)
-	pdf.Cell(40, 10, fmt.Sprintf("Total Revenue: $%.2f", summary.TotalRevenue))
+	pdf.Cell(40, 10, fmt.Sprintf("Total Revenue: Rp %.2f", summary.TotalRevenue))
 	pdf.Ln(15)
 	
 	// Event Details
@@ -53,7 +53,7 @@ func GenerateSalesSummaryPDF(summary *types.SalesSummary) ([]byte, error) {
 		pdf.Cell(10, 10, fmt.Sprintf("%d", event.EventID))
 		pdf.Cell(80, 10, event.EventName)
 		pdf.Cell(30, 10, fmt.Sprintf("%d", event.TotalTickets))
-		pdf.Cell(30, 10, fmt.Sprintf("$%.2f", event.TotalRevenue))
+		pdf.Cell(30, 10, fmt.Sprintf("Rp %.2f", event.TotalRevenue))
 		pdf.Ln(8)
 	}
 	
@@ -92,7 +92,7 @@ func GenerateEventSalesPDF(summary *types.EventSalesSummary) ([]byte, error) {
 	pdf.Ln(8)
 	pdf.Cell(40, 10, fmt.Sprintf("Total Tickets Sold: %d", summary.TotalTickets))
 	pdf.Ln(8)
-	pdf.Cell(40, 10, fmt.Sprintf("Total Revenue: $%.2f", summary.TotalRevenue))
+	pdf.Cell(40, 10, fmt.Sprintf("Total Revenue: Rp %.2f", summary.TotalRevenue))
 	pdf.Ln(15)
 	
 	pdf.Ln(10)
@@ -114,7 +114,7 @@ func GenerateSalesSummaryCSV(summary *types.SalesSummary) ([]byte, error) {
 	writer := csv.NewWriter(buf)
 	
 	// Write headers
-	headers := []string{"Event ID", "Event Name", "Tickets Sold", "Revenue ($)"}
+	headers := []string{"Event ID", "Event Name", "Tickets Sold", "Revenue (Rp)"}
 	if err := writer.Write(headers); err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func GenerateEventSalesCSV(summary *types.EventSalesSummary) ([]byte, error) {
 	writer := csv.NewWriter(buf)
 	
 	// Write headers and data for the event
-	writer.Write([]string{"Event ID", "Event Name", "Tickets Sold", "Revenue ($)"})
+	writer.Write([]string{"Event ID", "Event Name", "Tickets Sold", "Revenue (Rp)"})
 	writer.Write([]string{
 		strconv.FormatUint(uint64(summary.EventID), 10),
 		summary.EventName,
