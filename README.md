@@ -32,6 +32,10 @@ A RESTful API for a ticketing system built with Go, Gin framework, GORM ORM, and
   /reports          - Reporting functionality
   /docs             - Swagger documentation
   /postman          - Postman collection
+  /tests            - Unit tests
+    /service        - Service layer tests
+    /repository     - Repository layer tests
+    /controller     - Controller layer tests
   main.go           - Application entry point
 ```
 
