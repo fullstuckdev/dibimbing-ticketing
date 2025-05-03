@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/taufikmulyawan/ticketing-system/entity"
 	"github.com/taufikmulyawan/ticketing-system/service"
+	"github.com/taufikmulyawan/ticketing-system/utils"
 )
 
 type EventController interface {
@@ -42,7 +43,7 @@ func NewEventController(eventService service.EventService, auditService service.
 // @Success 200 {object} map[string]interface{}
 // @Router /events [get]
 func (ctrl *eventController) GetAllEvents(c *gin.Context) {
-	page, limit := GetPaginationParams(c)
+	page, limit := utils.GetPaginationParams(c)
 
 	events, count, err := ctrl.eventService.GetAllEvents(page, limit)
 	if err != nil {
@@ -50,7 +51,7 @@ func (ctrl *eventController) GetAllEvents(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, GeneratePaginationResponse(events, page, limit, count))
+	c.JSON(http.StatusOK, utils.GeneratePaginationResponse(events, page, limit, count))
 }
 
 // GetEventByID godoc

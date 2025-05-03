@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/taufikmulyawan/ticketing-system/entity"
 	"github.com/taufikmulyawan/ticketing-system/service"
+	"github.com/taufikmulyawan/ticketing-system/utils"
 )
 
 type TicketController interface {
@@ -41,7 +42,7 @@ func NewTicketController(ticketService service.TicketService, auditService servi
 // @Success 200 {object} map[string]interface{}
 // @Router /tickets [get]
 func (ctrl *ticketController) GetAllTickets(c *gin.Context) {
-	page, limit := GetPaginationParams(c)
+	page, limit := utils.GetPaginationParams(c)
 
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -74,7 +75,7 @@ func (ctrl *ticketController) GetAllTickets(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, GeneratePaginationResponse(tickets, page, limit, count))
+	c.JSON(http.StatusOK, utils.GeneratePaginationResponse(tickets, page, limit, count))
 }
 
 // GetTicketByID godoc
