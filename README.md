@@ -8,9 +8,12 @@ A RESTful API for a ticketing system built with Go, Gin framework, GORM ORM, and
 - Event Management (CRUD operations)
 - Ticket Management (Purchase/View/Cancel)
 - Role-Based Access Control (Admin/User)
-- Report Generation
+- Report Generation with PDF and CSV exports
 - Pagination and Filtering
 - Input Validation
+- Audit Trail for user actions
+- File Upload/Download
+- Data Caching
 
 ## Tech Stack
 
@@ -18,6 +21,8 @@ A RESTful API for a ticketing system built with Go, Gin framework, GORM ORM, and
 - **ORM**: GORM
 - **Database**: MySQL
 - **Authentication**: JWT
+- **PDF Generation**: gofpdf
+- **Documentation**: Swagger
 
 ## Project Structure
 
@@ -29,13 +34,15 @@ A RESTful API for a ticketing system built with Go, Gin framework, GORM ORM, and
   /entity           - Database models
   /config           - Configuration
   /middleware       - HTTP middleware
-  /reports          - Reporting functionality
+  /reports          - Reporting and export functionality
   /docs             - Swagger documentation
   /postman          - Postman collection
   /tests            - Unit tests
     /service        - Service layer tests
     /repository     - Repository layer tests
     /controller     - Controller layer tests
+  /types            - Shared type definitions
+  /utils            - Utility functions
   main.go           - Application entry point
 ```
 
@@ -63,8 +70,18 @@ A RESTful API for a ticketing system built with Go, Gin framework, GORM ORM, and
 
 ### Reports (Admin only)
 
-- `GET /reports/summary` - Get overall sales report
-- `GET /reports/event/:id` - Get event-specific report
+- `GET /reports/summary` - Get overall sales report in JSON format
+- `GET /reports/event/:id` - Get event-specific report in JSON format
+- `GET /reports/summary/pdf` - Export overall sales report as PDF with Rupiah currency
+- `GET /reports/event/:id/pdf` - Export event-specific sales report as PDF with Rupiah currency
+- `GET /reports/summary/csv` - Export overall sales report as CSV with Rupiah currency
+- `GET /reports/event/:id/csv` - Export event-specific sales report as CSV with Rupiah currency
+
+### Audit Logs
+
+- `GET /my-audit-logs` - User can view their own activity logs
+- `GET /audit/logs` - Admin can view all audit logs
+- `GET /audit/:entity_type/:entity_id` - Admin can view logs for a specific entity
 
 ## Authentication
 
@@ -132,6 +149,28 @@ A Postman collection is included in the `postman` directory. To use it:
    - `base_url`: Your API base URL (default: http://localhost:8080)
    - `token`: JWT token obtained after login as a regular user
    - `admin_token`: JWT token obtained after login as an admin user
+
+## Report Export Features
+
+The system provides comprehensive reporting capabilities with both on-screen JSON data and downloadable PDF and CSV formats.
+
+### PDF Reports
+
+PDF reports include:
+
+- Professional formatting with title, data tables and summary sections
+- Rupiah (Rp) currency formatting for all monetary values
+- Automatic generation of file name with current date
+- Proper file headers for browser download
+
+### CSV Reports
+
+CSV exports include:
+
+- Standard CSV format compatible with spreadsheet applications
+- Header row with column names
+- Summary row with totals
+- Rupiah (Rp) currency denomination
 
 ## Development with Hot Reload
 
