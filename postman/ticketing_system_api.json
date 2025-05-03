@@ -410,6 +410,102 @@
             "description": "Get a summary of ticket sales and revenue for a specific event"
           },
           "response": []
+        },
+        {
+          "name": "Export Sales Report as PDF",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reports/summary/pdf",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "summary", "pdf"]
+            },
+            "description": "Export a PDF of ticket sales and revenue across all events"
+          },
+          "response": []
+        },
+        {
+          "name": "Export Event Sales Report as PDF",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reports/event/1/pdf",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "event", "1", "pdf"]
+            },
+            "description": "Export a PDF of ticket sales and revenue for a specific event"
+          },
+          "response": []
+        },
+        {
+          "name": "Export Sales Report as CSV",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reports/summary/csv",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "summary", "csv"]
+            },
+            "description": "Export a CSV of ticket sales and revenue across all events"
+          },
+          "response": []
+        },
+        {
+          "name": "Export Event Sales Report as CSV",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reports/event/1/csv",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "event", "1", "csv"]
+            },
+            "description": "Export a CSV of ticket sales and revenue for a specific event"
+          },
+          "response": []
         }
       ],
       "description": "Report generation endpoints (Admin only)"

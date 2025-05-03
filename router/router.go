@@ -77,6 +77,12 @@ func SetupRouter(
 		adminRoutes.GET("/reports/summary", reportController.GetSalesReport)
 		adminRoutes.GET("/reports/event/:id", reportController.GetEventSalesReport)
 		
+		// Report exports
+		adminRoutes.GET("/reports/summary/pdf", reportController.ExportSalesReportPDF)
+		adminRoutes.GET("/reports/summary/csv", reportController.ExportSalesReportCSV)
+		adminRoutes.GET("/reports/event/:id/pdf", reportController.ExportEventSalesReportPDF)
+		adminRoutes.GET("/reports/event/:id/csv", reportController.ExportEventSalesReportCSV)
+		
 		// Audit logs (admin only)
 		adminRoutes.GET("/audit/logs", auditController.GetAuditLogs)
 		adminRoutes.GET("/audit/:entity_type/:entity_id", auditController.GetEntityAuditLogs)

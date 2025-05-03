@@ -1,26 +1,22 @@
 package service
 
 import (
+	"github.com/taufikmulyawan/ticketing-system/reports"
 	"github.com/taufikmulyawan/ticketing-system/repository"
+	"github.com/taufikmulyawan/ticketing-system/types"
 )
 
-type EventSalesSummary struct {
-	EventID       uint    `json:"event_id"`
-	EventName     string  `json:"event_name"`
-	TotalTickets  int64   `json:"total_tickets"`
-	TotalRevenue  float64 `json:"total_revenue"`
-}
-
-type SalesSummary struct {
-	TotalEvents   int64              `json:"total_events"`
-	TotalTickets  int64              `json:"total_tickets"`
-	TotalRevenue  float64            `json:"total_revenue"`
-	EventSummary  []EventSalesSummary `json:"event_summary"`
-}
+// Type aliases for backward compatibility
+type EventSalesSummary = types.EventSalesSummary
+type SalesSummary = types.SalesSummary
 
 type ReportService interface {
 	GetSalesSummary() (*SalesSummary, error)
 	GetEventSalesSummary(eventID uint) (*EventSalesSummary, error)
+	ExportSalesSummaryPDF() ([]byte, error) 
+	ExportEventSalesPDF(eventID uint) ([]byte, error)
+	ExportSalesSummaryCSV() ([]byte, error)
+	ExportEventSalesCSV(eventID uint) ([]byte, error)
 }
 
 type reportService struct {
@@ -95,4 +91,42 @@ func (s *reportService) GetEventSalesSummary(eventID uint) (*EventSalesSummary, 
 	}
 
 	return eventSummary, nil
+}
+
+// Export methods
+
+func (s *reportService) ExportSalesSummaryPDF() ([]byte, error) {
+	summary, err := s.GetSalesSummary()
+	if err != nil {
+		return nil, err
+	}
+	
+	return reports.GenerateSalesSummaryPDF(summary)
+}
+
+func (s *reportService) ExportEventSalesPDF(eventID uint) ([]byte, error) {
+	summary, err := s.GetEventSalesSummary(eventID)
+	if err != nil {
+		return nil, err
+	}
+	
+	return reports.GenerateEventSalesPDF(summary)
+}
+
+func (s *reportService) ExportSalesSummaryCSV() ([]byte, error) {
+	summary, err := s.GetSalesSummary()
+	if err != nil {
+		return nil, err
+	}
+	
+	return reports.GenerateSalesSummaryCSV(summary)
+}
+
+func (s *reportService) ExportEventSalesCSV(eventID uint) ([]byte, error) {
+	summary, err := s.GetEventSalesSummary(eventID)
+	if err != nil {
+		return nil, err
+	}
+	
+	return reports.GenerateEventSalesCSV(summary)
 } 

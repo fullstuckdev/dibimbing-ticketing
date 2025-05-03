@@ -934,6 +934,174 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Export Sales Report as PDF (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is application/pdf\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Disposition header is present\", function () {",
+                  "    pm.response.to.have.header(\"Content-Disposition\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\".pdf\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/summary/pdf",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "summary", "pdf"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Event Sales Report as PDF (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is application/pdf\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Disposition header is present\", function () {",
+                  "    pm.response.to.have.header(\"Content-Disposition\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\".pdf\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/event/{{event_id}}/pdf",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "event", "{{event_id}}", "pdf"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Sales Report as CSV (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is text/csv\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/csv\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Disposition header is present\", function () {",
+                  "    pm.response.to.have.header(\"Content-Disposition\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\".csv\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/summary/csv",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "summary", "csv"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Event Sales Report as CSV (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 OK\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Type is text/csv\", function () {",
+                  "    pm.response.to.have.header(\"Content-Type\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/csv\");",
+                  "});",
+                  "",
+                  "pm.test(\"Content-Disposition header is present\", function () {",
+                  "    pm.response.to.have.header(\"Content-Disposition\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"attachment\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\".csv\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/reports/event/{{event_id}}/csv",
+              "host": ["{{base_url}}"],
+              "path": ["reports", "event", "{{event_id}}", "csv"]
+            }
+          },
+          "response": []
         }
       ]
     }
