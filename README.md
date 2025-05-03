@@ -132,3 +132,34 @@ A Postman collection is included in the `postman` directory. To use it:
    - `base_url`: Your API base URL (default: http://localhost:8080)
    - `token`: JWT token obtained after login as a regular user
    - `admin_token`: JWT token obtained after login as an admin user
+
+## Development with Hot Reload
+
+This project supports hot reloading using [Air](https://github.com/air-verse/air), which automatically rebuilds and restarts the application when file changes are detected.
+
+### Installing Air
+
+```bash
+# Install Air globally
+go install github.com/air-verse/air@latest
+
+# Add Go bin directory to your PATH if it's not already added
+# For bash/zsh (add to ~/.bashrc or ~/.zshrc):
+# export PATH=$PATH:$(go env GOPATH)/bin
+
+# Verify installation
+$(go env GOPATH)/bin/air -v
+# Or just 'air -v' if Go bin is in your PATH
+```
+
+### Running with Air
+
+```bash
+# If Go bin is in your PATH:
+air
+
+# Or using the full path:
+$(go env GOPATH)/bin/air
+```
+
+Air will watch for any changes in your Go files and automatically rebuild and restart the server, making development much faster.
