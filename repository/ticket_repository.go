@@ -44,7 +44,7 @@ func (r *ticketRepository) FindAll(page, limit int, userID uint) ([]entity.Ticke
 	}
 
 	// Get tickets with pagination
-	if err := query.Preload("Event").Offset(offset).Limit(limit).Find(&tickets).Error; err != nil {
+	if err := query.Preload("Event").Preload("User").Offset(offset).Limit(limit).Find(&tickets).Error; err != nil {
 		return nil, 0, err
 	}
 
