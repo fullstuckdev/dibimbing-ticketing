@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
@@ -20,11 +21,13 @@ type EventController interface {
 
 type eventController struct {
 	eventService service.EventService
+	auditService service.AuditService
 }
 
-func NewEventController(eventService service.EventService) EventController {
+func NewEventController(eventService service.EventService, auditService service.AuditService) EventController {
 	return &eventController{
 		eventService: eventService,
+		auditService: auditService,
 	}
 }
 
@@ -126,11 +129,42 @@ func (ctrl *eventController) CreateEvent(c *gin.Context) {
 		return
 	}
 
+	// Get user ID from token for audit
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id, ok := userID.(float64)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	oldEvent, _ := json.Marshal(nil) // No old event exists
+	
 	err := ctrl.eventService.CreateEvent(&event)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	// Log event creation in the audit trail
+	newEvent, _ := json.Marshal(event)
+	ipAddress := c.ClientIP()
+	userAgent := c.Request.UserAgent()
+	
+	go ctrl.auditService.LogActivity(
+		uint(id),
+		entity.ActionCreate,
+		"event",
+		event.ID,
+		string(oldEvent),
+		string(newEvent),
+		ipAddress,
+		userAgent,
+	)
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Event created successfully", "event_id": event.ID})
 }
@@ -153,6 +187,14 @@ func (ctrl *eventController) UpdateEvent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
 		return
 	}
+
+	// Get the existing event for audit log
+	oldEvent, err := ctrl.eventService.GetEventByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
+		return
+	}
+	oldEventJSON, _ := json.Marshal(oldEvent)
 
 	var event entity.Event
 	if err := c.ShouldBindJSON(&event); err != nil {
@@ -186,11 +228,43 @@ func (ctrl *eventController) UpdateEvent(c *gin.Context) {
 		return
 	}
 
+	// Get user ID from token for audit
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uID, ok := userID.(float64)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
 	err = ctrl.eventService.UpdateEvent(uint(id), &event)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	// Get updated event for audit log
+	updatedEvent, _ := ctrl.eventService.GetEventByID(uint(id))
+	updatedEventJSON, _ := json.Marshal(updatedEvent)
+	
+	// Log event update in the audit trail
+	ipAddress := c.ClientIP()
+	userAgent := c.Request.UserAgent()
+	
+	go ctrl.auditService.LogActivity(
+		uint(uID),
+		entity.ActionUpdate,
+		"event",
+		uint(id),
+		string(oldEventJSON),
+		string(updatedEventJSON),
+		ipAddress,
+		userAgent,
+	)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Event updated successfully"})
 }
@@ -212,12 +286,48 @@ func (ctrl *eventController) DeleteEvent(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid event ID"})
 		return
 	}
+	
+	// Get the existing event for audit log
+	oldEvent, err := ctrl.eventService.GetEventByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
+		return
+	}
+	oldEventJSON, _ := json.Marshal(oldEvent)
+	
+	// Get user ID from token for audit
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uID, ok := userID.(float64)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
+		return
+	}
 
 	err = ctrl.eventService.DeleteEvent(uint(id))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	// Log event deletion in the audit trail
+	ipAddress := c.ClientIP()
+	userAgent := c.Request.UserAgent()
+	
+	go ctrl.auditService.LogActivity(
+		uint(uID),
+		entity.ActionDelete,
+		"event",
+		uint(id),
+		string(oldEventJSON),
+		"", // No new state after deletion
+		ipAddress,
+		userAgent,
+	)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Event deleted successfully"})
 } 

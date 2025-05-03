@@ -30,6 +30,7 @@ func ConnectDatabase() {
 		&entity.User{},
 		&entity.Event{},
 		&entity.Ticket{},
+		&entity.AuditLog{},
 	)
 
 	if err != nil {

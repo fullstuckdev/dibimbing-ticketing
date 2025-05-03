@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -18,11 +19,13 @@ type TicketController interface {
 
 type ticketController struct {
 	ticketService service.TicketService
+	auditService  service.AuditService
 }
 
-func NewTicketController(ticketService service.TicketService) TicketController {
+func NewTicketController(ticketService service.TicketService, auditService service.AuditService) TicketController {
 	return &ticketController{
 		ticketService: ticketService,
+		auditService:  auditService,
 	}
 }
 
@@ -149,11 +152,30 @@ func (ctrl *ticketController) PurchaseTicket(c *gin.Context) {
 
 	ticket.UserID = uint(id)
 
+	// Store the pre-purchase ticket data for audit
+	oldTicket, _ := json.Marshal(nil) // No old ticket exists
+	
 	err := ctrl.ticketService.PurchaseTicket(&ticket)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	// Explicitly log the ticket purchase in the audit trail
+	newTicket, _ := json.Marshal(ticket)
+	ipAddress := c.ClientIP()
+	userAgent := c.Request.UserAgent()
+	
+	go ctrl.auditService.LogActivity(
+		uint(id),
+		entity.ActionCreate,
+		"ticket",
+		ticket.ID,
+		string(oldTicket),
+		string(newTicket),
+		ipAddress,
+		userAgent,
+	)
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Ticket purchased successfully", "ticket_id": ticket.ID})
 }
@@ -188,12 +210,40 @@ func (ctrl *ticketController) CancelTicket(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
 		return
 	}
+	
+	// Get the ticket before cancellation for audit purposes
+	oldTicket, _ := ctrl.ticketService.GetTicketByID(uint(id))
+	if oldTicket == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Ticket not found"})
+		return
+	}
+	
+	oldTicketJSON, _ := json.Marshal(oldTicket)
 
 	err = ctrl.ticketService.CancelTicket(uint(id), uint(userIDUint))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	
+	// Get updated ticket after cancellation
+	updatedTicket, _ := ctrl.ticketService.GetTicketByID(uint(id))
+	updatedTicketJSON, _ := json.Marshal(updatedTicket)
+	
+	// Explicitly log the ticket cancellation in the audit trail
+	ipAddress := c.ClientIP()
+	userAgent := c.Request.UserAgent()
+	
+	go ctrl.auditService.LogActivity(
+		uint(userIDUint),
+		entity.ActionUpdate, // Cancellation is an update to the ticket status
+		"ticket",
+		uint(id),
+		string(oldTicketJSON),
+		string(updatedTicketJSON),
+		ipAddress,
+		userAgent,
+	)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Ticket cancelled successfully"})
 } 

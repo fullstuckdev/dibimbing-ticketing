@@ -28,18 +28,21 @@ func main() {
 	userRepo := repository.NewUserRepository()
 	eventRepo := repository.NewEventRepository()
 	ticketRepo := repository.NewTicketRepository()
+	auditRepo := repository.NewAuditRepository()
 
 	// Initialize services
 	userService := service.NewUserService(userRepo)
 	eventService := service.NewEventService(eventRepo)
 	ticketService := service.NewTicketService(ticketRepo, eventRepo)
 	reportService := service.NewReportService(ticketRepo, eventRepo)
+	auditService := service.NewAuditService(auditRepo)
 
 	// Initialize controllers
-	userController := controller.NewUserController(userService)
-	eventController := controller.NewEventController(eventService)
-	ticketController := controller.NewTicketController(ticketService)
+	userController := controller.NewUserController(userService, auditService)
+	eventController := controller.NewEventController(eventService, auditService)
+	ticketController := controller.NewTicketController(ticketService, auditService)
 	reportController := controller.NewReportController(reportService)
+	auditController := controller.NewAuditController(auditService)
 
 	// Initialize router
 	router := gin.Default()
@@ -59,6 +62,9 @@ func main() {
 		c.Next()
 	})
 
+	// Add audit middleware to all routes
+	router.Use(middleware.AuditMiddleware(auditService))
+
 	// Swagger documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -74,6 +80,8 @@ func main() {
 	{
 		// User routes
 		authRoutes.GET("/profile", userController.Profile)
+		authRoutes.POST("/logout", userController.Logout)
+		authRoutes.GET("/my-audit-logs", userController.GetMyAuditLogs)
 
 		// Ticket routes
 		authRoutes.GET("/tickets", ticketController.GetAllTickets)
@@ -94,6 +102,10 @@ func main() {
 		// Reports
 		adminRoutes.GET("/reports/summary", reportController.GetSalesReport)
 		adminRoutes.GET("/reports/event/:id", reportController.GetEventSalesReport)
+		
+		// Audit logs (admin only)
+		adminRoutes.GET("/audit/logs", auditController.GetAuditLogs)
+		adminRoutes.GET("/audit/:entity_type/:entity_id", auditController.GetEntityAuditLogs)
 	}
 
 	// Start the server
